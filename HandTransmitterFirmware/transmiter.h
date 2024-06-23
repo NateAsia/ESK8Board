@@ -22,7 +22,7 @@ class Joystick{
             uint8_t y_axis_pin;
         };
 
-        Joystick(); 
+        Joystick(){} 
         void    init(Joystick::pins_t pins);
         bool    isButtonPressed();
         bool    lastButtonState;
@@ -34,7 +34,7 @@ class LED{
       uint8_t _pin;
       bool    _state; 
   public:
-      LED();
+      LED(){}
       void init(uint8_t);
       void set(bool);
 };

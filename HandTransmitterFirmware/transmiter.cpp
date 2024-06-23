@@ -5,8 +5,6 @@
 
 
 // Joystick
-Joystick::Joystick(){}
-
 void Joystick::init(Joystick::pins_t pins){
     _btn_pin    = pins.btn_pin;
     _x_axis_pin = pins.x_axis_pin;
@@ -28,8 +26,6 @@ bool Joystick::isButtonPressed(){
 
 
 // LED
-LED::LED(){}
-
 void LED::init(uint8_t pin){
     _pin = pin;
     pinMode(_pin, OUTPUT);
