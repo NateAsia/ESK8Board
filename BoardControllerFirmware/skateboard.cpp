@@ -78,9 +78,13 @@ bool ButtonSwitch::getState(){
 
 Skateboard::Skateboard(){
     _pwm_enable = false;
+    _rf_value = 1150; 
     _inputThrottlePercent = 50.0;
     _outputThrottlePercent = 50.0;
-    _last_message_time = millis(); 
+    _throttle_servo_position = 90; 
+    _last_message_time = millis();
+    _last_display_update = _last_message_time;
+
 }
 void Skateboard::initESC(uint8_t pin){
     esc.attach(pin); 
