@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 
+#include "CommsProtocol/ESK8Comms.h"
+
 // Digital connection pins (Digital Pins)
 #define CLK 4
 #define DIO 5
@@ -46,7 +48,6 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   
 }
-
 
 void check_rf(){
   if (rec.available()) {
