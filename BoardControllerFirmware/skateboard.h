@@ -22,7 +22,7 @@
 
 #define DISPLAY_UPDATE_INTERVAL 500 // 500 milliseconds
 #define BTN_DEBOUNCE            100 // 100 milliseconds
-#define RADIO_DISCONNECT_TIME   100 // 100 milliseeconds
+#define RADIO_DISCONNECT_TIME   100 // 100 milliseconds
 #define MOTOR_OFF_THROTTLE      50  // 50% 
 
 class VoltMeter

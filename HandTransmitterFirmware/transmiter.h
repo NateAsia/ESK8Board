@@ -6,6 +6,9 @@
 #include <stdint.h>
 #include <RCSwitch.h>
 
+#define BUTTON_DEBOUNCE_TIME 40 // 40 ms
+
+
 class Joystick{
     private:
         uint8_t _btn_pin;
@@ -46,7 +49,8 @@ class Transmitter{
         RCSwitch    radio;
 
         uint8_t     _isr_btn_pin;
-        bool        _isr_btn_last_state;
+        bool        _isr_flag;
+        bool        _isr_flag_prev;
 
         uint8_t     _rf_sleep_pin;
         bool        _transmit_enable;
@@ -58,8 +62,9 @@ class Transmitter{
         void initJoystick(Joystick::pins_t);
         void initLED(uint8_t);
         void initRadio(uint8_t data_pin, uint8_t rf_sleep_pin); 
-        void initISR(uint8_t);
+        void initISR(uint8_t pin, void (*userFunc)(void));
 
+        void isrFlag();
         void isrCheck();
         
         void goto_sleep();

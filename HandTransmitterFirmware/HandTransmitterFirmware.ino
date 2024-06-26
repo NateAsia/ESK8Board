@@ -13,8 +13,11 @@ Transmitter remote = Transmitter();
 static void myISR();
 void initISR(); 
 
+#define SERIAL
+
 void setup() {
   Serial.begin(9600);
+  Serial.println("Hand Transmitter Start");
   remote.initJoystick({
     .btn_pin = BUTTON_PIN, 
     .x_axis_pin = POT_PIN, 
@@ -22,20 +25,17 @@ void setup() {
     });
   remote.initLED(LED_PIN);
   remote.initRadio(RF_DATA_PIN, RF_SLEEP_PIN);
-  initISR(WAKEUP_PIN);
+  remote.initISR(WAKEUP_PIN, myISR);
+  delay(200);
 }
 
 void loop() {
   remote.updateInput();
+  remote.isrCheck();
   remote.transmitPacket();
   delay(10); // Adjust the delay as needed
 }
 
 static void myISR(){
-  remote.isrCheck();
-}
-
-void initISR(uint8_t pin){
-    pinMode(pin, INPUT);
-    attachInterrupt(0, myISR, LOW);
+  remote.isrFlag();
 }
