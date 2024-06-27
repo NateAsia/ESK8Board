@@ -17,7 +17,7 @@ void initISR();
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Hand Transmitter Start");
+  Serial.println("\nHand Transmitter Start");
   remote.initJoystick({
     .btn_pin = BUTTON_PIN, 
     .x_axis_pin = POT_PIN, 
@@ -30,9 +30,7 @@ void setup() {
 }
 
 void loop() {
-  remote.updateInput();
-  remote.isrCheck();
-  remote.transmitPacket();
+  remote.run();
   delay(10); // Adjust the delay as needed
 }
 

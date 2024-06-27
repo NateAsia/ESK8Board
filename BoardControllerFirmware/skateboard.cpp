@@ -1,3 +1,5 @@
+#include "Arduino.h"
+#include "HardwareSerial.h"
 /**
  * @file skateboard.cpp
  * @author Nathaniel Asia
@@ -14,6 +16,7 @@
 #include "skateboard.h"
 #include "wiring_private.h"
 #include <TM1637Display.h>
+#include <stdint.h>
 
 
 void VoltMeter::init(uint8_t pin){
@@ -22,16 +25,11 @@ void VoltMeter::init(uint8_t pin){
 float VoltMeter::readVoltage(){
     return voltage = analogRead(A0)* 5.0 * 9.0 / 1023.0;
 }
-float VoltMeter::getSOC(){
+uint8_t VoltMeter::getSOC(){
 
-    stateOfCharge = map(readVoltage(), 20, 25, 0, 100); 
+    stateOfCharge = (uint8_t) map(readVoltage(), 20, 25, 0, 100); 
+    stateOfCharge = constrain(stateOfCharge, 0, 100);
         // change this from a linear map to lithium-ion SOC map
-    #ifdef SERIAL_ENABLE
-        Serial.print("V_div ");
-        Serial.print(voltage);
-        Serial.print(" ");
-        Serial.println(stateOfCharge);
-    #endif
 
     return stateOfCharge;
 }
@@ -69,7 +67,7 @@ bool ButtonSwitch::getState(){
     }
     // After debouncing, perform action
     if (_state & !_disable & (millis() - _last_hold_start > BTN_DEBOUNCE)){
-        _switchState = ~_switchState; 
+        _switchState = !_switchState; 
         _disable = true;
     }
     return _switchState;
@@ -122,8 +120,9 @@ void Skateboard::checkActiveStatus(){
 }
 void Skateboard::updateBatteryStatus(){
     if (millis() - _last_display_update > DISPLAY_UPDATE_INTERVAL){
+        _soc = battery.getSOC() * 100;
         display.showNumberDec(
-            battery.getSOC() * 100, 
+            _soc, 
             false
         );
         _last_display_update = millis();
@@ -132,21 +131,46 @@ void Skateboard::updateBatteryStatus(){
 void Skateboard::updateThrottleOutput(){
     _outputThrottlePercent = _inputThrottlePercent;
 
-    if ( ~_pwm_enable || millis()-_last_message_time > RADIO_DISCONNECT_TIME){
+    if ( !_pwm_enable || millis()-_last_message_time > RADIO_DISCONNECT_TIME){
         _outputThrottlePercent = MOTOR_OFF_THROTTLE;
     }
-    #ifdef SERIAL_ENABLE
-        Serial.println( _outputThrottlePercent );
-    #endif
-
     _throttle_servo_position = map(_outputThrottlePercent, 0, 100, 0, 180);
-    
-    esc.write(_throttle_servo_position); // Makes the PWM Waveform 
+    this->esc.write(_throttle_servo_position); // Makes the PWM Waveform
 
 }
+void Skateboard::printStatus(){
+  
+  snprintf(buffer, 
+        sizeof(buffer), 
+        "Battery SOC: %d"
+        "\tRADIO_INPUT: %d"
+        "\tThrottle Input: %d"
+        "\tThrottle Output: %d",
+         this->_soc,
+         this->_rf_value,
+         this->_inputThrottlePercent,
+         this->_outputThrottlePercent);
+  Serial.println(buffer);
+}
 void Skateboard::run(){
-    updateBatteryStatus();
-    checkActiveStatus();
-    updateThrottleInput();
-    updateThrottleOutput();
+    // long bt = micros();
+    this->updateBatteryStatus();
+    // long as =  micros();
+    this->checkActiveStatus();
+    // long ti = micros();
+    this->updateThrottleInput();
+    // long to = micros();
+    this->updateThrottleOutput();
+    // long p = micros();
+    #if SERIAL_ENABLE 
+      this->printStatus();
+    #endif
+    // long now = micros();
+    // Serial.println(as-bt);
+    // Serial.println(ti-as);
+    // Serial.println(to-ti);
+    // Serial.println(p-to);
+    // Serial.println(now-p);
+    // while(1);
+    delay(1);
 }

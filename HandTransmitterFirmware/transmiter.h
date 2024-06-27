@@ -7,6 +7,7 @@
 #include <RCSwitch.h>
 
 #define BUTTON_DEBOUNCE_TIME 40 // 40 ms
+#define RF_BASE 1100
 
 
 class Joystick{
@@ -54,7 +55,7 @@ class Transmitter{
 
         uint8_t     _rf_sleep_pin;
         bool        _transmit_enable;
-        float       percentage;
+        uint8_t     throttle_percentage;
 
         bool isrButtonPressed();
     public:
@@ -73,6 +74,8 @@ class Transmitter{
         void transmitPacket();
 
         bool canTransmit();
+
+        void run();
 };
 
 

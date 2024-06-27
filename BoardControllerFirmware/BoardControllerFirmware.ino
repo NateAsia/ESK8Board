@@ -13,12 +13,15 @@
 Skateboard board = Skateboard();
 
 void setup() {
-  if (SERIAL_ENABLE) Serial.begin(9600);
+  #ifdef SERIAL_ENABLE
+    Serial.begin(9600);
+    Serial.println("ESK8 Microcontroller Startup");
+  #endif
 
   board.initStatusLight(LED_PIN);
   board.initRadio();
   board.initESC(ESC_PIN);
-  board.initStatusSwitch(ESC_PIN);
+  board.initStatusSwitch(BUTTON_PIN);
   board.initDisplay(
     DISPLAY_CLK_PIN, 
     DISPLAY_DIN_IN
