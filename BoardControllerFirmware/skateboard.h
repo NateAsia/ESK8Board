@@ -24,20 +24,28 @@
 #define BTN_DEBOUNCE            40 // 100 milliseconds
 #define RADIO_DISCONNECT_TIME   100 // 100 milliseconds
 #define MOTOR_OFF_THROTTLE      50  // 50% 
-#define SERIAL_ENABLE true
+// #define SERIAL_ENABLE true
+
+// const dict<float, int> lithium_ion_SOC = {
+//   {3.0, 0},
+//   {3.2, 10},
+//   {3.5, 50},
+//   {3.7, 90},
+//   {4.2, 100},
+// }
 
 class VoltMeter
 {
 private:
     uint8_t _pin;
     float voltage;
-    uint8_t stateOfCharge; 
+    int8_t stateOfCharge; 
 public:
     VoltMeter() {}
 
     void      init(uint8_t);
     float     readVoltage();
-    uint8_t   getSOC();
+    int8_t   getSOC();
 };
 
 class LED{
@@ -68,20 +76,20 @@ public:
 
 class Skateboard{
 private:
-    Servo           esc; 
+    Servo           *esc; 
     LED             statusLight;
     ButtonSwitch    statusSwitch;
     RCSwitch        radio;
-    TM1637Display   &display;
+    TM1637Display   *display;
     VoltMeter       battery;
     
     char        buffer[200];
     uint8_t     _soc;
     bool        _pwm_enable;
-    int    _rf_value;
-    int     _inputThrottlePercent;
-    int     _outputThrottlePercent;
-    int     _throttle_servo_position;
+    uint32_t    _rf_value;
+    uint8_t     _inputThrottlePercent;
+    uint8_t     _outputThrottlePercent;
+    uint8_t     _throttle_servo_position;
     long        _last_message_time;
     long        _last_display_update;
 

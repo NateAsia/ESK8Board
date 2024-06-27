@@ -8,7 +8,7 @@
 #define ESC_PIN 9
 
 // Software Definitions  
-#define SERIAL_ENABLE true
+// #define SERIAL_ENABLE
 
 Skateboard board = Skateboard();
 
