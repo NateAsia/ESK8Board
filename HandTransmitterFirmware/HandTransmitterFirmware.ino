@@ -1,5 +1,4 @@
-#include "CommsProtocol/ESK8Comms.h"
-#include "transmiter.h"
+#include "transmitter.h"
 
 #define BUTTON_PIN 9
 #define WAKEUP_PIN 2
@@ -7,13 +6,11 @@
 #define RF_DATA_PIN 5
 #define RF_SLEEP_PIN 12
 #define POT_PIN A0
+#define SERIAL
 
 Transmitter remote = Transmitter();
 
 static void myISR();
-void initISR(); 
-
-#define SERIAL
 
 void setup() {
   Serial.begin(9600);
@@ -29,11 +26,8 @@ void setup() {
   delay(200);
 }
 
-void loop() {
-  remote.run();
-  delay(10); // Adjust the delay as needed
-}
+void loop(){remote.run();}
 
-static void myISR(){
-  remote.isrFlag();
-}
+static void myISR(){remote.isrFlag();}
+
+

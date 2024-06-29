@@ -15,16 +15,23 @@
 #ifndef SKATEBOARD_H_
 #define SKATEBOARD_H_
 
+#include "Arduino.h"
+#include "HardwareSerial.h"
 #include <stdint.h>
 #include <TM1637Display.h>
 #include <Servo.h>
 #include <RCSwitch.h>
+#include "ESK8Comms.h"
+#include "wiring_private.h"
 
 #define DISPLAY_UPDATE_INTERVAL 500 // 500 milliseconds
 #define BTN_DEBOUNCE            40 // 100 milliseconds
 #define RADIO_DISCONNECT_TIME   100 // 100 milliseconds
 #define MOTOR_OFF_THROTTLE      50  // 50% 
-// #define SERIAL_ENABLE true
+#define SERIAL_ENABLE true
+
+#define MAX_BAT_V 24.0
+#define MIN_BAT_V 18.0
 
 // const dict<float, int> lithium_ion_SOC = {
 //   {3.0, 0},
@@ -38,14 +45,14 @@ class VoltMeter
 {
 private:
     uint8_t _pin;
-    float voltage;
-    int8_t stateOfCharge; 
+    float   voltage;
+    uint16_t stateOfCharge; 
 public:
     VoltMeter() {}
 
     void      init(uint8_t);
     float     readVoltage();
-    int8_t   getSOC();
+    uint8_t   getSOC();
 };
 
 class LED{
@@ -86,12 +93,14 @@ private:
     char        buffer[200];
     uint8_t     _soc;
     bool        _pwm_enable;
-    uint32_t    _rf_value;
+    uint16_t    _rf_value;
     uint8_t     _inputThrottlePercent;
     uint8_t     _outputThrottlePercent;
     uint8_t     _throttle_servo_position;
     long        _last_message_time;
     long        _last_display_update;
+
+    ESK8Comms::packet_t packet;
 
     void checkActiveStatus(); 
     void updateThrottleInput();

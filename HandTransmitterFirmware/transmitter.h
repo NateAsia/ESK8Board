@@ -1,20 +1,28 @@
-
-
 #ifndef TRANSMITTER_H_
 #define TRANSMITTER_H_
 
 #include <stdint.h>
 #include <RCSwitch.h>
+#include "HardwareSerial.h"
+#include "Arduino.h"
+#include "wiring_private.h"
+#include <LowPower.h>
+#include "ESK8Comms.h"
 
 #define BUTTON_DEBOUNCE_TIME 40 // 40 ms
 #define RF_BASE 1100
+#define MAX_ADC_BASE 600
 
 
 class Joystick{
     private:
-        uint8_t _btn_pin;
-        uint8_t _x_axis_pin;
-        uint8_t _y_axis_pin;
+        uint8_t   _btn_pin;
+        uint8_t   _x_axis_pin;
+        uint8_t   _y_axis_pin;
+        uint16_t  _adc_reading;
+        uint16_t  _center_adc_reading;
+        uint16_t  _max_adc_reading;
+        int8_t   percent;
         
     public:
         enum inputAxis{ X, Y };
@@ -30,7 +38,8 @@ class Joystick{
         void    init(Joystick::pins_t pins);
         bool    isButtonPressed();
         bool    lastButtonState;
-        float   getAxisPercent(inputAxis); 
+        float   getAxisPercent(inputAxis);
+        void    calibrateMax(bool);
 };
 
 class LED{
@@ -55,9 +64,8 @@ class Transmitter{
 
         uint8_t     _rf_sleep_pin;
         bool        _transmit_enable;
-        uint8_t     throttle_percentage;
 
-        bool isrButtonPressed();
+        ESK8Comms::packet_t packet;
     public:
         Transmitter();
         void initJoystick(Joystick::pins_t);

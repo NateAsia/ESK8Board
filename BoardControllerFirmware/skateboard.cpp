@@ -1,5 +1,3 @@
-#include "Arduino.h"
-#include "HardwareSerial.h"
 /**
  * @file skateboard.cpp
  * @author Nathaniel Asia
@@ -14,22 +12,24 @@
 
 
 #include "skateboard.h"
-#include "wiring_private.h"
-#include <TM1637Display.h>
-#include <stdint.h>
 
 // #define RUN_TIMING_TEST
 
 
 void VoltMeter::init(uint8_t pin) {
   _pin = pin;
+  analogReference(INTERNAL);
 }
 float VoltMeter::readVoltage() {
-  voltage = analogRead(A0) * 5.0 * 9.0 / 1023.0;
+  voltage = analogRead(A0);
+  voltage *= 5.0; // ADC Voltage Max
+  voltage *= 9.0; // Voltage Divider Multiplier Inverse 
+  voltage /= 1023.0;
   return voltage;
 }
-int8_t VoltMeter::getSOC() {
-  stateOfCharge = map(readVoltage(), 20, 25, 0, 100);
+uint8_t VoltMeter::getSOC() {
+  stateOfCharge = (readVoltage()-MIN_BAT_V) * 100;
+  stateOfCharge /= (MAX_BAT_V-MIN_BAT_V);
   stateOfCharge = constrain(stateOfCharge, 0, 100);
   return stateOfCharge;
 }
@@ -107,12 +107,13 @@ void Skateboard::initBattery(uint8_t pin) {
 void Skateboard::updateThrottleInput() {
   if (radio.available()) {
     _rf_value = radio.getReceivedValue();
+    packet = *((ESK8Comms::packet_t*) &_rf_value);
     // add encoding (switch to using a 32 bit unsigned int) add a code at the start and the end
-    _last_message_time = millis();
     radio.resetAvailable();
-  }
-  if ((_rf_value >= 1100) && (_rf_value <= 1200)) {
-    _inputThrottlePercent = _rf_value - 1100;
+    if (ESK8Comms::validPacket(packet)) {
+      _inputThrottlePercent = ESK8Comms::readAPPSFromPacket(packet);
+      _last_message_time = millis();
+    }
   }
 }
 void Skateboard::checkActiveStatus() {
@@ -121,10 +122,8 @@ void Skateboard::checkActiveStatus() {
 }
 void Skateboard::updateBatteryStatus() {
   if (millis() - _last_display_update > DISPLAY_UPDATE_INTERVAL) {
-    _soc = battery.getSOC() * 100;
-    display->showNumberDec(
-      _soc,
-      false);
+    _soc = battery.getSOC();
+    display->showNumberDec(_soc);
     _last_display_update = millis();
   }
 }
@@ -138,10 +137,12 @@ void Skateboard::updateThrottleOutput() {
   esc->write(_throttle_servo_position);  // Makes the PWM Waveform
 }
 void Skateboard::printStatus() {
+  
+  ESK8Comms::printPacket(packet);
   snprintf(buffer,
            sizeof(buffer),
-           "Battery SOC: %d"
-           "\tRADIO_INPUT: %d"
+           "\tBattery SOC: %d"
+           "\tRADIO_INPUT: %x"
            "\tThrottle Input: %d"
            "\tThrottle Output: %d"
            "\tServo Position: %d",
