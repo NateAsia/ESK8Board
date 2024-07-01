@@ -28,7 +28,7 @@
 #define BTN_DEBOUNCE            40 // 100 milliseconds
 #define RADIO_DISCONNECT_TIME   100 // 100 milliseconds
 #define MOTOR_OFF_THROTTLE      50  // 50% 
-#define SERIAL_ENABLE true
+// #define SERIAL_ENABLE true
 
 #define MAX_BAT_V 24.0
 #define MIN_BAT_V 18.0
@@ -57,12 +57,16 @@ public:
 
 class LED{
   private:
-      uint8_t _pin;
-      bool    _state; 
+      uint8_t   _pin;
+      bool      _state;
+      bool      _led_state;  
+      long      _last_flash_time;
+      uint16_t  _flash_period; 
   public:
       LED(){}
-      void init(uint8_t);
+      void init(uint8_t, uint16_t = 0);
       void set(bool);
+      void run(long);
 };
 
 class ButtonSwitch{
@@ -79,6 +83,7 @@ public:
     bool readPin();
     bool readEdge();
     bool getState();
+    void setState(bool);
 };
 
 class Skateboard{
@@ -111,7 +116,7 @@ private:
 public:
     Skateboard();
     void initESC(uint8_t);
-    void initStatusLight(uint8_t);
+    void initStatusLight(uint8_t, uint16_t = 0);
     void initStatusSwitch(uint8_t);
     void initRadio();
     void initDisplay(uint8_t, uint8_t);

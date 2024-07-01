@@ -3,12 +3,14 @@
 // Digital connection pins (Digital Pins)
 #define DISPLAY_CLK_PIN 4
 #define DISPLAY_DIN_IN 5
-#define LED_PIN 8
+// #define LED_PIN 8
+#define LED_PIN LED_BUILTIN
+#define FLASH_PERIOD 50 // 50 ms
 #define BUTTON_PIN 12
 #define ESC_PIN 9
 
 // Software Definitions  
-#define SERIAL_ENABLE
+// #define SERIAL_ENABLE
 
 Skateboard board = Skateboard();
 
@@ -18,7 +20,7 @@ void setup() {
     Serial.println("ESK8 Microcontroller Startup");
   #endif
 
-  board.initStatusLight(LED_PIN);
+  board.initStatusLight(LED_PIN, FLASH_PERIOD);
   board.initRadio();
   board.initESC(ESC_PIN);
   board.initStatusSwitch(BUTTON_PIN);

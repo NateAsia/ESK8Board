@@ -1,3 +1,4 @@
+#include "Arduino.h"
 /**
  * @file skateboard.cpp
  * @author Nathaniel Asia
@@ -17,31 +18,46 @@
 
 
 void VoltMeter::init(uint8_t pin) {
-  _pin = pin;
+  this->_pin = pin;
   analogReference(INTERNAL);
 }
 float VoltMeter::readVoltage() {
-  voltage = analogRead(A0);
-  voltage *= 5.0; // ADC Voltage Max
-  voltage *= 9.0; // Voltage Divider Multiplier Inverse 
-  voltage /= 1023.0;
-  return voltage;
+  this->voltage = analogRead(A0);
+  this->voltage *= 5.0; // ADC Voltage Max
+  this->voltage *= 9.0; // Voltage Divider Multiplier Inverse 
+  this->voltage /= 1023.0;
+  return this->voltage;
 }
 uint8_t VoltMeter::getSOC() {
-  stateOfCharge = (readVoltage()-MIN_BAT_V) * 100;
-  stateOfCharge /= (MAX_BAT_V-MIN_BAT_V);
-  stateOfCharge = constrain(stateOfCharge, 0, 100);
+  this->stateOfCharge = (readVoltage()-MIN_BAT_V) * 100;
+  this->stateOfCharge /= (MAX_BAT_V-MIN_BAT_V);
+  this->stateOfCharge = constrain(this->stateOfCharge, 0, 100);
   return stateOfCharge;
 }
 
 // LED
-void LED::init(uint8_t pin) {
-  _pin = pin;
+void LED::init(uint8_t pin, uint16_t flash_period = 0) {
+  this->_pin = pin;
+  this->_flash_period = flash_period;
+  this->_last_flash_time = millis();
+  this->_state = false;
+  this->_led_state = false;
   pinMode(_pin, OUTPUT);
 }
 void LED::set(bool state) {
-  _state = state;
-  digitalWrite(_pin, _state);
+  this->_state = state;
+}
+void LED::run(long currTime){ 
+  if(this->_state){
+    if (this->_flash_period && currTime - this->_last_flash_time > this->_flash_period){
+      this->_last_flash_time=currTime;
+      this->_led_state = !this->_led_state;
+      digitalWrite(_pin, this->_led_state);
+    }
+  } 
+  else{
+    digitalWrite(_pin, _led_state);
+  }
 }
 
 
@@ -72,6 +88,9 @@ bool ButtonSwitch::getState() {
   }
   return _switchState;
 }
+void ButtonSwitch::setState(bool state){
+  _switchState = state;
+}
 
 
 Skateboard::Skateboard() {
@@ -83,12 +102,13 @@ Skateboard::Skateboard() {
   _last_message_time = millis();
   _last_display_update = _last_message_time;
   esc = new Servo(); 
+  statusSwitch.setState(true);
 }
 void Skateboard::initESC(uint8_t pin) {
   esc->attach(pin);
 }
-void Skateboard::initStatusLight(uint8_t pin) {
-  statusLight.init(pin);
+void Skateboard::initStatusLight(uint8_t pin, uint16_t flash_period) {
+  statusLight.init(pin, flash_period);
   statusLight.set(_pwm_enable);
 }
 void Skateboard::initStatusSwitch(uint8_t pin) {
@@ -119,6 +139,7 @@ void Skateboard::updateThrottleInput() {
 void Skateboard::checkActiveStatus() {
   _pwm_enable = statusSwitch.getState();
   statusLight.set(_pwm_enable);
+  statusLight.run(millis());
 }
 void Skateboard::updateBatteryStatus() {
   if (millis() - _last_display_update > DISPLAY_UPDATE_INTERVAL) {
@@ -138,7 +159,7 @@ void Skateboard::updateThrottleOutput() {
 }
 void Skateboard::printStatus() {
   
-  ESK8Comms::printPacket(packet);
+  // ESK8Comms::printPacket(packet);
   snprintf(buffer,
            sizeof(buffer),
            "\tBattery SOC: %d"
@@ -184,5 +205,5 @@ void Skateboard::run() {
       this->printStatus();
     #endif
   #endif 
-  delay(1);
+  // delay(1);
 }
