@@ -30,29 +30,47 @@
 #define MOTOR_OFF_THROTTLE      50  // 50% 
 // #define SERIAL_ENABLE true
 
-#define MAX_BAT_V 24.0
+#define MAX_BAT_V 25.2
 #define MIN_BAT_V 18.0
 
-// const dict<float, int> lithium_ion_SOC = {
-//   {3.0, 0},
-//   {3.2, 10},
-//   {3.5, 50},
-//   {3.7, 90},
-//   {4.2, 100},
-// }
+
+typedef struct vToSOC_t{
+  float voltage;
+  uint8_t soc;
+} voltageToSOC ;
+
+const voltageToSOC lithium_ion_6s_SOC[] = {
+  {18.0, 0},
+  {19.8, 10},
+  {21.6, 50},
+  {23.2, 90},
+  {25.2, 100},
+};
+
 
 class VoltMeter
 {
 private:
-    uint8_t _pin;
-    float   voltage;
-    uint16_t stateOfCharge; 
+    uint8_t   _pin;
+    
+    float     *v_avg_l;
+    uint8_t   _v_avg_l_size;
+    float     v_l_sum;
+    uint8_t   v_l_oldest_index; 
+    uint8_t   _v_list_count;
+    
+    float     voltage;
+    float     voltAvg; 
+    
+    float     stateOfCharge; 
+    
+    float     readVoltage();
+    float     averageVoltage();
 public:
     VoltMeter() {}
 
-    void      init(uint8_t);
-    float     readVoltage();
-    uint8_t   getSOC();
+    void      init(uint8_t, uint8_t = 1);
+    uint16_t  getSOC();
 };
 
 class LED{
@@ -120,7 +138,7 @@ public:
     void initStatusSwitch(uint8_t);
     void initRadio();
     void initDisplay(uint8_t, uint8_t);
-    void initBattery(uint8_t);
+    void initBattery(uint8_t, uint8_t = 1);
 
     void run();
 };
