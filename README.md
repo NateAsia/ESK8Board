@@ -90,10 +90,25 @@ A DIY electric skateboard control system featuring a handheld remote and board-m
 - Board controller maintains safe state during signal loss
 - Battery voltage is sampled and filtered for stability
 
+## Warning
+
+> [!CAUTION]
+> This is a DIY electric skateboard control system that interfaces with high-power electrical components and motor controllers. Improper assembly or use could result in serious injury or death.
+>
+> - This project is provided "AS IS" without warranty of any kind
+> - The author assumes NO responsibility or liability for any injuries, damages, or losses
+> - You are solely responsible for the safe implementation and use of this system
+> - Building and using this system indicates acceptance of all risks involved
+>
+> **REQUIRED SAFETY MEASURES:**
+> - Always wear appropriate safety gear (helmet, pads, etc.)
+> - Thoroughly test all systems before riding
+> - Ensure all electrical connections are secure and properly insulated
+> - Install and test emergency cutoff systems
+> - Never exceed the rated specifications of your components
+>
+> By using any part of this project, you acknowledge that electric skateboarding is inherently dangerous and agree that the author (Nathaniel Asia) shall not be held liable for any direct, indirect, incidental, special, exemplary, or consequential damages arising from the use of this project.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Warning
-
-This is a DIY project for electric skateboard control. Use at your own risk and always wear appropriate safety gear. Ensure all connections are secure and properly insulated before use.
