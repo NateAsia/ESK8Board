@@ -94,10 +94,6 @@ A DIY electric skateboard control system featuring a handheld remote and board-m
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Author
-
-Nathaniel Asia
-
 ## Warning
 
 This is a DIY project for electric skateboard control. Use at your own risk and always wear appropriate safety gear. Ensure all connections are secure and properly insulated before use.
