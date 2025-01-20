@@ -6,7 +6,6 @@
  * @version 0.1
  * @date 2024-06-27
  * 
- * @copyright Copyright (c) 2024
  * 
  */
 
