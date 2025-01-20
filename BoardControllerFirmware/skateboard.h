@@ -16,95 +16,19 @@
 #define SKATEBOARD_H_
 
 #include "Arduino.h"
-#include "HardwareSerial.h"
-#include <stdint.h>
 #include <TM1637Display.h>
 #include <Servo.h>
 #include <RCSwitch.h>
 #include "ESK8Comms.h"
-#include "wiring_private.h"
+#include "led.h"
+#include "button_switch.h"
+#include "voltmeter.h"
 
 #define DISPLAY_UPDATE_INTERVAL 500 // 500 milliseconds
-#define BTN_DEBOUNCE            40 // 100 milliseconds
 #define RADIO_DISCONNECT_TIME   100 // 100 milliseconds
 #define MOTOR_OFF_THROTTLE      50  // 50% 
-// #define SERIAL_ENABLE true
 
-#define MAX_BAT_V 25.2
-#define MIN_BAT_V 18.0
-
-
-typedef struct vToSOC_t{
-  float voltage;
-  uint8_t soc;
-} voltageToSOC ;
-
-const voltageToSOC lithium_ion_6s_SOC[] = {
-  {18.0, 0},
-  {19.8, 10},
-  {21.6, 50},
-  {23.2, 90},
-  {25.2, 100},
-};
-
-
-class VoltMeter
-{
-private:
-    uint8_t   _pin;
-    
-    float     *v_avg_l;
-    uint8_t   _v_avg_l_size;
-    float     v_l_sum;
-    uint8_t   v_l_oldest_index; 
-    uint8_t   _v_list_count;
-    
-    float     voltage;
-    float     voltAvg; 
-    
-    float     stateOfCharge; 
-    
-    float     readVoltage();
-    float     averageVoltage();
-public:
-    VoltMeter() {}
-
-    void      init(uint8_t, uint8_t = 1);
-    uint16_t  getSOC();
-};
-
-class LED{
-  private:
-      uint8_t   _pin;
-      bool      _state;
-      bool      _led_state;  
-      long      _last_flash_time;
-      uint16_t  _flash_period; 
-  public:
-      LED(){}
-      void init(uint8_t, uint16_t = 0);
-      void set(bool);
-      void run(long);
-};
-
-class ButtonSwitch{
-private:
-    uint8_t _pin;
-    long    _last_hold_start;
-    bool    _disable;
-    bool    _state;
-    bool    _last_state;
-    bool    _switchState;
-public:
-    Button() {}
-    void init(uint8_t);
-    bool readPin();
-    bool readEdge();
-    bool getState();
-    void setState(bool);
-};
-
-class Skateboard{
+class Skateboard {
 private:
     Servo           *esc; 
     LED             statusLight;
@@ -133,16 +57,13 @@ private:
 
 public:
     Skateboard();
-    void initESC(uint8_t);
-    void initStatusLight(uint8_t, uint16_t = 0);
-    void initStatusSwitch(uint8_t);
+    void initESC(uint8_t pin);
+    void initStatusLight(uint8_t pin, uint16_t flash_period = 0);
+    void initStatusSwitch(uint8_t pin);
     void initRadio();
-    void initDisplay(uint8_t, uint8_t);
-    void initBattery(uint8_t, uint8_t = 1);
-
+    void initDisplay(uint8_t clk_pin, uint8_t dio_pin);
+    void initBattery(uint8_t pin, uint8_t num_samples = 1);
     void run();
 };
-
-
 
 #endif // SKATEBOARD_H_
