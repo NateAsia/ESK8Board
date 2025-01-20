@@ -1,1 +1,8 @@
 .DS_Store
+
+
+# Comms files
+BoardControllerFirmware/ESK8Comms.h
+BoardControllerFirmware/ESK8Comms.cpp
+HandTransmitterFirmware/ESK8Comms.h
+HandTransmitterFirmware/ESK8Comms.cpp
